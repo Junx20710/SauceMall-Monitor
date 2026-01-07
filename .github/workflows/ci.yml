@@ -93,7 +93,7 @@ jobs:
   deploy-report:
     needs: test-and-report
     runs-on: ubuntu-latest
-    if: always() # 无论测试成功失败，都尝试发报告
+    if: always()
     steps:
       - name: Download Allure Results
         uses: actions/download-artifact@v4
@@ -101,26 +101,25 @@ jobs:
           name: allure-results
           path: allure-results
 
-      - name: Get Allure history
-        uses: actions/checkout@v3
-        if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
+      # 1. 安装 Allure 命令行工具 (Java环境)
+      - name: Install Allure
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+          wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+          tar -zxvf allure-2.24.0.tgz
+          sudo mv allure-2.24.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-      - name: Generate Report
-        uses: simple-elf/allure-report-action@master
-        if: always()
-        with:
-          allure_results: allure-results
-          allure_history: allure-history
-          keep_reports: 20
+      # 2. 生成静态网页 (这一步生成的文件夹很干净，没有 .git)
+      - name: Generate HTML Report
+        run: allure generate allure-results --clean -o _site
 
+      # 3. 部署到 gh-pages (使用官方推荐的 jamesiives/github-pages-deploy-action)
+      # 这个插件更强大，能自动处理分支创建和权限问题
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: always()
+        uses: jamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: _site
