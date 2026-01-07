@@ -1,1 +1,1 @@
-{"total":1,"items":[{"uid":"e0f2cff7d5d3cba85c28a9dc560c53a3","name":"SauceMall 全链路测试","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}}]}
+{"total":2,"items":[{"uid":"bf2689b4a04335b70bbfd03a0f929394","name":"API 高级测试","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}},{"uid":"e0f2cff7d5d3cba85c28a9dc560c53a3","name":"SauceMall 全链路测试","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}}]}
