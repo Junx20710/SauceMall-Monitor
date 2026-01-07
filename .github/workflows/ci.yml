@@ -23,8 +23,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: saucemall
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_USER: saucemall_user
+          MYSQL_PASSWORD: saucemall_password
         ports:
           # 左边是宿主机端口(代码连这个)，右边是容器端口
           # 因为你本地代码写死了连 3307，所以这里也映射到 3307
