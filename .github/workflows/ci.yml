@@ -95,6 +95,11 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
