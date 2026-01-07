@@ -1,0 +1,2 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Wed Jan 07 18:03:33 UTC 2026","Wed Jan 07 18:03:35 UTC 2026","2088","tests","test_e2e","TestSauceMallE2E","","","验证 UI 抓取数据与 API 返回数据的一致性","流程：爬虫抓取 -> 数据库存储 -> API 查询 -> 数据比对"
