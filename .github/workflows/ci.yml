@@ -107,6 +107,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install uv
+        run: pip install uv
+
+      - name: Set up Python
+        run: uv python install 3.9
+
+      - name: Install Dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          # 直接从 requirements.txt 安装，保证和测试环境一致
+          uv pip install -r requirements.txt
+
       - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
@@ -145,6 +158,9 @@ jobs:
         env:
           FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
         run: |
+          # 激活环境
+          source .venv/bin/activate
+          
           # 构造报告链接: https://<username>.github.io/<repo-name>/
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           
@@ -157,6 +173,7 @@ jobs:
         env:
           FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
         run: |
+          source .venv/bin/activate
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           
           export PYTHONPATH=$PYTHONPATH:.
