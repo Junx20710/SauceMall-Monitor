@@ -50,20 +50,40 @@ jobs:
       - name: Set up Python
         run: uv python install 3.9
 
+      # --- 缓存配置开始 ---
+      - name: Cache uv dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright
+      # --- 缓存配置结束 ---
+
       - name: Install Dependencies
         # 使用 uv 安装依赖，并安装 Playwright 浏览器
         run: |
           uv venv
-          # 激活虚拟环境的简便写法 (在 GitHub Actions 里)
+          # 激活虚拟环境
           source .venv/bin/activate
           
-          # 安装项目依赖 (如果有 pyproject.toml 最好，没有就用 requirements.txt)
-          # 这里假设你生成了 requirements.txt，如果没有，请看下面的补充说明
+          # 安装依赖 (uv 会自动利用缓存)
           uv pip install -r requirements.txt
           uv pip install pytest playwright allure-pytest flask requests pymysql cryptography
           
-          # 安装浏览器驱动
-          playwright install chromium
+          # 仅当缓存没命中时，才下载浏览器
+          if [ "${{ steps.cache-playwright.outputs.cache-hit }}" != "true" ]; then
+            playwright install chromium
+          else
+            echo "Playwright browsers restored from cache."
+          fi
 
       - name: Initialize Database
         # 运行我们写的 db_manager 建表

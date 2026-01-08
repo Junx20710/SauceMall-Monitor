@@ -58,6 +58,7 @@ graph TD
 
 *   **🛡️ 持续监控 (Continuous Monitoring)**
     *   **GitHub Actions**: 每日早上 8 点自动触发全链路测试。
+    *   **Smart Caching**: 缓存依赖 (uv) 和浏览器二进制文件 (Playwright)，构建速度提升 50%。
     *   **Service Containers**: CI 环境自动编排 MySQL 容器。
     *   **IM 通知**: 测试报告自动推送到**飞书(Feishu)/钉钉**群。
 
