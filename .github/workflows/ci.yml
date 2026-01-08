@@ -5,6 +5,10 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # 定时任务 (Continuous Monitoring)
+  # 每天北京时间早上 8:00 运行 (UTC 0:00)
+  schedule:
+    - cron: '0 0 * * *'
 
 permissions:
   contents: write
@@ -128,3 +132,28 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: _site
+      
+      # ===============================
+      # 4. 发送飞书通知 (Webhook)
+      # ===============================
+      # 只有当前面的所有步骤都成功，且我们配置了 secret 时才发送
+      - name: Send Feishu Notification (Success)
+        if: success()
+        env:
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+        run: |
+          # 构造报告链接: https://<username>.github.io/<repo-name>/
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          
+          python utils/notification.py success \
+            "**构建成功！**\n\n- 分支: ${{ github.ref_name }}\n- 提交: ${{ github.sha }}\n- [点击查看测试报告]($REPORT_URL)"
+
+      - name: Send Feishu Notification (Failure)
+        if: failure()
+        env:
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+        run: |
+          REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          
+          python utils/notification.py failure \
+            "**构建失败！** 请检查日志。\n\n- [点击查看 Actions 日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"

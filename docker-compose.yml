@@ -1,24 +1,51 @@
 version: '3.8'
 
 services:
+  # ===============================
+  # 数据库服务 (Database Service)
+  # ===============================
   db:
+    # 镜像: 使用 MySQL 5.7 官方镜像
     image: mysql:5.7
+    
+    # 容器名称: 指定一个好记的名字，方便用 `docker ps` 查看
     container_name: saucemall_db
+    
+    # 重启策略: 如果容器崩了或者 Docker 重启了，它会自动重启 (生产环境必备)
     restart: always
+    
+    # 环境变量: 设置 MySQL 的 root 密码和初始化配置
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: saucemall
       MYSQL_USER: saucemall_user
       MYSQL_PASSWORD: saucemall_password
+    
+    # 端口映射: 宿主机端口:容器端口
+    # 我们映射到 3307 是为了避免和本地可能安装的 MySQL (3306) 冲突
     ports:
       - "3307:3306"
-    # Persist data even if the container is removed
+    
+    # ===============================
+    # 数据持久化 (Data Persistence)
+    # ===============================
+    # 即使你删除了容器 (docker-compose down)，数据卷里的数据还在。
+    # 下次启动时，MySQL 会读取这些数据。
     volumes:
       - db_data:/var/lib/mysql
+    
+    # ===============================
+    # 健康检查 (Health Check)
+    # ===============================
+    # 告诉 Docker 怎么判断这个数据库"活着"。
+    # 仅仅进程在跑(Running)不够，必须能响应 ping 命令才算健康(Healthy)。
+    # 这对依赖它的服务（比如 Web App）非常重要。
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 10s   # 每 10 秒检查一次
+      timeout: 5s     # 每次检查超时时间
+      retries: 5      # 连续 5 次失败才判定为不健康
+
+# 定义数据卷 top-level key
 volumes:
   db_data:
