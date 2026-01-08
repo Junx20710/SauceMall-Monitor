@@ -69,12 +69,14 @@ jobs:
         # 运行我们写的 db_manager 建表
         run: |
           source .venv/bin/activate
+          export PYTHONPATH=$PYTHONPATH:.
           python database/db_manager.py
 
       - name: Start Backend API
         # 在后台启动 Flask，并将日志输出到文件以便调试
         run: |
           source .venv/bin/activate
+          export PYTHONPATH=$PYTHONPATH:.
           nohup python app.py > flask.log 2>&1 &
           echo "等待 Flask 启动..."
           sleep 5
@@ -83,6 +85,7 @@ jobs:
         # 运行测试并生成 Allure 源数据
         run: |
           source .venv/bin/activate
+          export PYTHONPATH=$PYTHONPATH:.
           pytest tests/ --alluredir=allure-results
         continue-on-error: true # 即使测试挂了，也继续执行（为了看报告）
 
@@ -145,6 +148,7 @@ jobs:
           # 构造报告链接: https://<username>.github.io/<repo-name>/
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           
+          export PYTHONPATH=$PYTHONPATH:.
           python utils/notification.py success \
             "**构建成功！**\n\n- 分支: ${{ github.ref_name }}\n- 提交: ${{ github.sha }}\n- [点击查看测试报告]($REPORT_URL)"
 
@@ -155,5 +159,6 @@ jobs:
         run: |
           REPORT_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           
+          export PYTHONPATH=$PYTHONPATH:.
           python utils/notification.py failure \
             "**构建失败！** 请检查日志。\n\n- [点击查看 Actions 日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
